@@ -1,0 +1,10 @@
+# local only
+CLAUDE.md
+.claude/
+
+# build by-products
+__pycache__/
+build/_tmp_*.pdf
+build/shots.out.mjs
+build/img/grey/
+tests/
