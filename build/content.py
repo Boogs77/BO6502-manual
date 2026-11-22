@@ -448,10 +448,10 @@ def story(L):
             ['J-EXTVDP', T('chiuso', 'closed'), T('ingresso EXTVDP a massa (nessun video esterno)', 'EXTVDP input to ground (no external video)')]])
     module(T('Seriale', 'Serial'), gallery('BO6502 SERIAL', 'Serial_final_rev03.png'), T(
         "Una <b>W65C51</b> con quarzo da 1,8432 MHz e un <b>MAX232</b> per i livelli RS-232, sul connettore DB9 "
-        "(piedino 2 = dati verso la scheda, 3 = dati dalla scheda, 5 = massa). CTS, DCD e DSR sono a massa: non "
+        "(piedino 2 = dati dalla scheda, TXD; 3 = dati verso la scheda, RXD; 5 = massa). CTS, DCD e DSR sono a massa: non "
         "c'è controllo di flusso. Risponde in tutto il blocco $Cxxx.",
         "A <b>W65C51</b> with a 1.8432 MHz crystal and a <b>MAX232</b> for the RS-232 levels, on the DB9 connector "
-        "(pin 2 = data to the board, 3 = data from the board, 5 = ground). CTS, DCD and DSR are grounded: there is "
+        "(pin 2 = data from the board, TXD; 3 = data to the board, RXD; 5 = ground). CTS, DCD and DSR are grounded: there is "
         "no flow control. It answers in the whole $Cxxx block."))
     module(T('KEYb (tastiera)', 'KEYb (keyboard)'), gallery('BO6502 KEYb', 'KEYb_final-rev01.png'), T(
         "La tastiera si collega al connettore <b>DIN a 5 poli</b> (piedino 1 clock, 2 dati, 4 massa, 5 +5 V; "
