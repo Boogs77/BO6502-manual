@@ -70,3 +70,9 @@ display tests of the emulator.
 - [miniVIC_bios](https://github.com/Boogs77/miniVIC_bios): BIOS
 - [BO6502-miniVIC-emulator](https://github.com/Boogs77/BO6502-miniVIC-emulator): browser emulator
 - [miniVIC-manual](https://github.com/Boogs77/miniVIC-manual): the manual of the single-board miniVIC
+
+---
+
+## License
+
+The text and the images of this repository are released under the [Creative Commons Attribution 4.0 International License](LICENSE) (CC BY 4.0). Copyright (c) 2026 Boogs77. You may share and adapt them, also commercially, as long as you credit the author and link to this repository.
