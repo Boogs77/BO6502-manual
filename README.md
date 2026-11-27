@@ -21,6 +21,8 @@ BIOS **16.11.26 KEYB/SD R2**:
 
 - I. Overview: specification, the 39-pin bus, memory map (with binary addresses), device map, address decoding
 - II. The modules: every board with its jumpers, how to put a system together, getting started
+  (AUDIO is rev. 03: one PCB built twice for the left and right channels, decoder on the left board only, chip select
+  to the right one on SPARE2)
 - III. Schematics: one sheet per module
 - IV. Bill of materials: one list per module, taken from the EAGLE files
 - V. The devices: every register of the CPU, TMS9918A, W65C51 ACIA, W65C22 VIAs, keyboard, joysticks

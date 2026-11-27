@@ -29,7 +29,7 @@ SCHEMATIC = [
     ('KEYb rev01', HW / 'BO6502 KEYb' / 'export' / 'BO6502-KEYb.pdf'),
     ('JOYSTICK rev02', HW / 'BO6502 JOYSTICK' / 'export' / 'BO6502-JOYSTICK-002.pdf'),
     ('SD CARD rev02', HW / 'BO6502 SDCard' / 'export' / 'BO6502-SDCARD.pdf'),
-    ('AUDIO 021', HW / 'BO6502 AUDIO' / 'export' / 'BO6502-AUDIO_021.pdf'),
+    ('AUDIO rev03', HW / 'BO6502 AUDIO' / 'export' / 'BO6502-AUDIO_021.pdf'),
     ('BIG LCD rev02', HW / 'BO6502 BIGLCD' / 'export' / 'BO6502-LCDBIG.pdf'),
     ('LCD-KEYb rev02', HW / 'BO6502 LCD_KEYb' / 'export' / 'BO6502-LCD-KEYb.pdf'),
     ('LED', HW / 'BO6502 LED' / 'export' / 'BO6502-LEDs.pdf'),
@@ -199,7 +199,7 @@ def story(L):
         (T('   Capacità', '   Capacity'), T('32 Kbyte, $8000-$FFFF (meno le pagine di I/O)', '32 Kbyte, $8000-$FFFF (less the I/O pages)')),
         (T('MEMORIA RAM', 'RAM MEMORY'), 'HITACHI HM62256LP-12'),
         (T('   Capacità', '   Capacity'), T('32 Kbyte, $0000-$7FFF', '32 Kbyte, $0000-$7FFF')),
-        (T('BUS', 'BUS'), T('39 poli: indirizzi, dati, controllo, alimentazione, 3 linee libere',
+        (T('BUS', 'BUS'), T('39 poli: indirizzi, dati, controllo, alimentazione, 3 linee di riserva',
                             '39 pins: address, data, control, power, 3 spare lines')),
         (T('USCITA VIDEO', 'VIDEO OUTPUT'), T('TMS9918A, composito su RCA, 15 colori, 32 sprite',
                                               'TMS9918A, composite on RCA, 15 colours, 32 sprites')),
@@ -246,11 +246,11 @@ def story(L):
     add(TBL(rows, [0.08, 0.253] * 3, center_cols=(0, 2, 4)))
     add(P(T(
         "PHI0 è il clock che arriva dalla scheda CPU (o dalla scheda RESET) ed è quello che usano le periferiche "
-        "come PHI2. TX e RX collegano la seriale a schede come il bridge ESP32 WebServerESP-6205; SPARE1-3 "
-        "sono libere.",
+        "come PHI2. TX e RX collegano la seriale a schede come il bridge ESP32 WebServerESP-6205; SPARE2 porta il "
+        "chip select tra le due schede AUDIO (sezione II); SPARE1 e SPARE3 sono libere.",
         "PHI0 is the clock coming from the CPU board (or from the RESET board) and is the one the peripherals use "
-        "as PHI2. TX and RX bring the serial line to boards such as the ESP32 bridge WebServerESP-6205; SPARE1-3 "
-        "are free.")))
+        "as PHI2. TX and RX bring the serial line to boards such as the ESP32 bridge WebServerESP-6205; SPARE2 carries the chip "
+        "select between the two AUDIO boards (section II); SPARE1 and SPARE3 are free.")))
 
     add(H2(T('Mappa della memoria', 'Memory map')))
     add(P(T(
@@ -325,7 +325,7 @@ def story(L):
     dec = [[T('USCITA DEL 3° 138', 'OUTPUT OF THE 3RD 138'), 'A7 A6 A5 A4', T('INDIRIZZO', 'ADDRESS'), T('SCHEDA', 'BOARD')],
            ['Y0', '1 0 0 0', '$D180', 'KEYb'], ['Y1', '1 0 0 1', '$D190', 'BIG LCD'],
            ['Y2', '1 0 1 0', '$D1A0', 'JOYSTICK'], ['Y3', '1 0 1 1', '$D1B0', 'SD CARD'],
-           ['Y4', '1 1 0 0', '$D1C0', T('AUDIO (A3 a 0; A2 sceglie il canale)', 'AUDIO (A3 at 0; A2 picks the channel)')],
+           ['Y4', '1 1 0 0', '$D1C0', T('AUDIO (A3 non decodificato; A2 sceglie il canale)', 'AUDIO (A3 not decoded; A2 picks the channel)')],
            ['Y5-Y7', '1 1 x x', '$D1D0-$D1F0', T('libere per nuove schede', 'free for new boards')]]
     add(TBL(dec, [0.24, 0.18, 0.18, 0.40], center_cols=(0, 1, 2)))
 
@@ -350,7 +350,7 @@ def story(L):
             ['BIG LCD', '02', 'W65C22, T6963C', '$D190', T('definitivo', 'final')],
             ['JOYSTICK', '02', 'W65C22', '$D1A0', T('definitivo', 'final')],
             ['SD CARD', '02', 'W65C22, LM317', '$D1B0', T('definitivo', 'final')],
-            ['AUDIO', '021', 'AY-3-8910, LM386', '$D1C0 / $D1C4', T('in prova', 'in testing')],
+            ['AUDIO', '03', 'AY-3-8910, LM386', '$D1C0 / $D1C4', T('definitivo', 'final')],
             ['LCD-KEYb', '02', 'W65C22, HD44780', '$Dxxx', T('superato da KEYb', 'replaced by KEYb')],
             ['LED', '-', 'W65C22, 16 LED', '$Dxxx', T('prova', 'test')],
             ['MONITOR', '01', 'Arduino Mega', '-', T('diagnostica', 'diagnostics')]]
@@ -479,22 +479,26 @@ def story(L):
         "SCK, <b>PA4</b> CS. An LM317 gives the 3.3 V of the SD module. The module plugs into the headers JP1 (GND, "
         "3V3, MISO) and JP2 (MOSI, SCK, CS); the free VIA lines (PA0, PA5-PA7, PB0-PB7) are brought out on the "
         "headers JP3-JP5 for future expansions. Access is to raw 512-byte sectors, without a file system."))
-    module(T('AUDIO (rev 021)', 'AUDIO (rev 021)'), HW / 'BO6502 AUDIO' / 'export' / 'AUDIO_021.png', T(
-        "Ogni scheda porta un <b>AY-3-8910</b> (tre voci, rumore, inviluppo), clock dal bus (PHI0). Due schede "
-        "fanno lo stereo: una configurata come canale <b>destro</b> ($D1C0), l'altra come <b>sinistro</b> "
-        "($D1C4). Un 74AC138 e un 74HCT00 ricavano BDIR e BC1 da A0, A1 e R/~W. L'uscita va sulla presa RCA "
-        "direttamente (attraverso un partitore) o attraverso l'amplificatore <b>LM386</b>. La prima versione "
+    module(T('AUDIO (rev 03)', 'AUDIO (rev 03)'), HW / 'BO6502 AUDIO' / 'export' / 'AUDIO_021.png', T(
+        "Un solo circuito stampato per i due canali: ogni scheda porta un <b>AY-3-8910</b> (tre voci, rumore, "
+        "inviluppo), clock dal bus (PHI0), e i ponticelli la rendono canale <b>destro</b> ($D1C0) o <b>sinistro</b> "
+        "($D1C4). La decodifica dell'indirizzo si fa <b>solo sulla scheda sinistra</b>: il chip select (~CS) arriva "
+        "alla destra su <b>SPARE2</b> (pin 38 del bus), quindi IC1, IC2 e IC3 si montano solo sulla sinistra. Un "
+        "74AC138 e un 74HCT00 per scheda ricavano BDIR e BC1 da A0, A1 e R/~W. L'uscita va sulla presa RCA. "
+        "C'è anche un amplificatore <b>LM386</b> facoltativo, non usato nelle due schede finali, che hanno J-CS2 su 1-2, JP1 aperto e JP2 chiuso (470 Ohm esclusa). La prima versione "
         "(AUDIO_005, due AY sulla stessa scheda) è superata.",
-        "Each board carries one <b>AY-3-8910</b> (three voices, noise, envelope), clocked from the bus (PHI0). Two "
-        "boards make stereo: one set up as the <b>right</b> channel ($D1C0), the other as the <b>left</b> one "
-        "($D1C4). A 74AC138 and a 74HCT00 make BDIR and BC1 from A0, A1 and R/~W. The output goes to the RCA socket "
-        "directly (through a divider) or through the <b>LM386</b> amplifier. The first version (AUDIO_005, two AYs "
-        "on the same board) is superseded."),
+        "One printed circuit for both channels: each board carries one <b>AY-3-8910</b> (three voices, noise, "
+        "envelope), clocked from the bus (PHI0), and the jumpers make it the <b>right</b> ($D1C0) or the <b>left</b> "
+        "($D1C4) channel. The address is decoded <b>on the left board only</b>: the chip select (~CS) reaches the right "
+        "one on <b>SPARE2</b> (bus pin 38), so IC1, IC2 and IC3 are fitted on the left board only. A 74AC138 and a "
+        "74HCT00 on each board make BDIR and BC1 from A0, A1 and R/~W. The output goes to the RCA socket. There is "
+        "also an optional <b>LM386</b> amplifier, not used on the two final boards, which have J-CS2 on 1-2, JP1 open and JP2 closed (470 Ohm out). The first version (AUDIO_005, "
+        "two AYs on the same board) is superseded."),
            [['J-CS0', T('1-2 / 2-3', '1-2 / 2-3'), T('canale sinistro / destro', 'left / right channel')],
             ['J-CS1', T('1-2 / 2-3', '1-2 / 2-3'), T('canale sinistro / destro (come J-CS0)', 'left / right channel (like J-CS0)')],
-            ['J-CS2', T('3 posizioni', '3 positions'), T('uscita diretta (AUDIO_DIR) o amplificata (AUDIO_AMP)', 'direct (AUDIO_DIR) or amplified (AUDIO_AMP) output')],
-            ['JP1', T('chiuso', 'closed'), T('abilita l\'amplificatore', 'enables the amplifier')],
-            ['JP2', T('aperto', 'open'), T('abilita la resistenza dell\'uscita diretta', 'enables the direct output resistor')]], w=100)
+            ['J-CS2', T('1-2 / 2-3', '1-2 / 2-3'), T('uscita diretta / amplificata', 'direct / amplified output')],
+            ['JP1', T('chiuso', 'closed'), T("abilita l'amplificatore", 'enables the amplifier')],
+            ['JP2', T('aperto / chiuso', 'open / closed'), T("resistenza da 470 Ohm dell'uscita diretta inserita / esclusa", '470 Ohm resistor of the direct output in series / bypassed')]], w=100)
     module(T('BIG LCD (display grafico)', 'BIG LCD (graphic display)'), gallery('BO6502 BIGLCD', 'BigLCD_final_rev02.png'), T(
         "Pilota un display grafico <b>DS-G160128STBWW</b> da 160x128 pixel con controller Toshiba <b>T6963C</b>, "
         "collegato con un cavo piatto. Il bus dati del display è la porta B della VIA; i segnali di controllo "
@@ -574,10 +578,10 @@ def story(L):
     # ================================================================ IV. BOM
     add(H1('IV', T('Distinta dei componenti', 'Bill of materials')))
     add(P(T(
-        "Le distinte sono ricavate dai file EAGLE di ogni scheda (per AUDIO dallo schema 021). Ogni scheda ha "
+        "Le distinte sono ricavate dai file EAGLE di ogni scheda (per AUDIO dalla revisione 03; sulla scheda AUDIO destra IC1, IC2 e IC3 non si montano). Ogni scheda ha "
         "anche il connettore del bus, il LED rosso con la sua resistenza da 330 Ohm e i condensatori di "
         "disaccoppiamento da 100 nF.",
-        "The lists come from the EAGLE files of every board (for AUDIO from schematic 021). Every board also has "
+        "The lists come from the EAGLE files of every board (for AUDIO from revision 03; IC1, IC2 and IC3 are not fitted on the right AUDIO board). Every board also has "
         "the bus connector, the red LED with its 330 Ohm resistor and the 100 nF decoupling capacitors.")))
     head = [T('COMPONENTE', 'COMPONENT'), T('DESCRIZIONE', 'DESCRIPTION'), T('SIGLE', 'REFERENCES'), T('Q.TÀ', 'QTY')]
     boms = [('BACKPLATE rev02', 'BO6502 BACKPLATE/eagle/backplate_final_rev02.sch'),
@@ -592,25 +596,14 @@ def story(L):
             ('KEYb', 'BO6502 KEYb/eagle/KEYb_final-rev01.sch'),
             ('JOYSTICK', 'BO6502 JOYSTICK/eagle/Joystick_final_rev02.sch'),
             ('SD CARD', 'BO6502 SDCard/eagle/SDcard_final_rev02.sch'),
-            ('AUDIO 021', None),
+            ('AUDIO rev03', 'BO6502 AUDIO/eagle/AUDIO_final_rev03.sch'),
             ('BIG LCD', 'BO6502 BIGLCD/eagle/BigLCD_final_rev02.sch'),
             ('LCD-KEYb', 'BO6502 LCD_KEYb/eagle/LCD_KEYb_final_rev02.sch'),
             ('LED', 'BO6502 LED/eagle/led_final.sch'),
             ('MONITOR', 'BO6502 MONITOR/eagle/MONITOR_final_rev01.sch')]
     for title, sch in boms:
         add(H3(title))
-        if sch:
-            rows = bom_rows(HW / sch, T)
-        else:
-            rows = [['AY-3-8910', T('generatore di suoni (PSG)', 'programmable sound generator (PSG)'), 'IC7', '1'],
-                    ['LM386N-1', T('amplificatore audio', 'audio amplifier'), 'IC6', '1'],
-                    ['74AC138', T('decodificatore 3 a 8', '3-to-8 decoder'), 'IC1, IC2, IC3, IC4', '4'],
-                    ['74HCT00', T('4 porte NAND (BDIR, BC1)', 'quad NAND gate (BDIR, BC1)'), 'IC5', '1'],
-                    [T('Resistenze', 'Resistors'), '1K x3, 10K, 470 x3, 4.7K, 330', 'R1-R9', '9'],
-                    [T('Condensatori', 'Capacitors'), T('100n, 10u, 2.2u, 300p, 47n, 47u, 250u', '100n, 10u, 2.2u, 300p, 47n, 47u, 250u'), 'C1-C17', '17'],
-                    [T('Ponticelli', 'Jumpers'), 'J-CS0, J-CS1, J-CS2, JP1, JP2', '', '5'],
-                    ['RCA', T('uscita audio', 'audio output'), 'RCAL', '1'],
-                    ['BUS 39, LED', T('connettore del bus, LED di alimentazione', 'bus connector, power LED'), 'U$1, LED1', '2']]
+        rows = bom_rows(HW / sch, T)
         add(TBL([head] + rows, [0.24, 0.36, 0.30, 0.10], center_cols=(3,), font=7.2))
 
     # ================================================================ V. HARDWARE REFERENCE
@@ -1179,7 +1172,7 @@ FFFA: B0 A7 08 E2 01 AA
           ['VDU', 'VDU_TMS_final_rev01', ''], ['SERIAL', 'Serial_final_rev03', ''],
           ['KEYb', 'KEYb_final-rev01', ''], ['JOYSTICK', 'Joystick_final_rev02', ''],
           ['SD CARD', 'SDcard_final_rev02', ''],
-          ['AUDIO', 'AUDIO_005 (2 AY), AUDIO_021 (1 AY)', T('021 del 16/05/2026, in prova', '021 of 16/05/2026, in testing')],
+          ['AUDIO', 'AUDIO_005 (2 AY), AUDIO_final_rev03 (1 AY)', T('la rev03 (schema 021) è quella definitiva', 'rev03 (schematic 021) is the final one')],
           ['BIG LCD', 'BigLCD_final_rev02', ''], ['LCD-KEYb', 'LCD_KEYb_final_rev02', ''],
           ['LED', 'led_final', ''], ['MONITOR', 'MONITOR_final_rev01', '']]
     add(TBL(rv, [0.17, 0.53, 0.30], font=7.4))
