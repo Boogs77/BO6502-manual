@@ -358,7 +358,10 @@ def story(L):
 
     def module(title, img, text, jumpers=None, extra=None, w=118):
         add(H2(title))
-        add(IMG_(img, w, None, border=False))
+        if isinstance(img, list):
+            add(IMGROW(img, (w - 10) / 2))
+        else:
+            add(IMG_(img, w, None, border=False))
         add(P(text))
         if jumpers:
             add(TBL([[T('PONTICELLO', 'JUMPER'), T('POSIZIONI', 'POSITIONS'), T('FUNZIONE', 'FUNCTION')]] + jumpers,
@@ -479,7 +482,11 @@ def story(L):
         "SCK, <b>PA4</b> CS. An LM317 gives the 3.3 V of the SD module. The module plugs into the headers JP1 (GND, "
         "3V3, MISO) and JP2 (MOSI, SCK, CS); the free VIA lines (PA0, PA5-PA7, PB0-PB7) are brought out on the "
         "headers JP3-JP5 for future expansions. Access is to raw 512-byte sectors, without a file system."))
-    module(T('AUDIO (rev 03)', 'AUDIO (rev 03)'), HW / 'BO6502 AUDIO' / 'export' / 'AUDIO_021.png', T(
+    module(T('AUDIO (rev 03)', 'AUDIO (rev 03)'), [
+        (gallery('BO6502 AUDIO', 'Audio_rev03_right.png'),
+         T('Canale destro (RCA rosso): IC1-IC3 non montati.', 'Right channel (red RCA): IC1-IC3 not fitted.')),
+        (gallery('BO6502 AUDIO', 'Audio_rev03_left.png'),
+         T('Canale sinistro (RCA bianco).', 'Left channel (white RCA).'))], T(
         "Un solo circuito stampato per i due canali: ogni scheda porta un <b>AY-3-8910</b> (tre voci, rumore, "
         "inviluppo), clock dal bus (PHI0), e i ponticelli la rendono canale <b>destro</b> ($D1C0) o <b>sinistro</b> "
         "($D1C4). La decodifica dell'indirizzo si fa <b>solo sulla scheda sinistra</b>: il chip select (~CS) arriva "
@@ -498,7 +505,7 @@ def story(L):
             ['J-CS1', T('1-2 / 2-3', '1-2 / 2-3'), T('canale sinistro / destro (come J-CS0)', 'left / right channel (like J-CS0)')],
             ['J-CS2', T('1-2 / 2-3', '1-2 / 2-3'), T('uscita diretta / amplificata', 'direct / amplified output')],
             ['JP1', T('chiuso', 'closed'), T("abilita l'amplificatore", 'enables the amplifier')],
-            ['JP2', T('aperto / chiuso', 'open / closed'), T("resistenza da 470 Ohm dell'uscita diretta inserita / esclusa", '470 Ohm resistor of the direct output in series / bypassed')]], w=100)
+            ['JP2', T('aperto / chiuso', 'open / closed'), T("resistenza da 470 Ohm dell'uscita diretta inserita / esclusa", '470 Ohm resistor of the direct output in series / bypassed')]], w=150)
     module(T('BIG LCD (display grafico)', 'BIG LCD (graphic display)'), gallery('BO6502 BIGLCD', 'BigLCD_final_rev02.png'), T(
         "Pilota un display grafico <b>DS-G160128STBWW</b> da 160x128 pixel con controller Toshiba <b>T6963C</b>, "
         "collegato con un cavo piatto. Il bus dati del display è la porta B della VIA; i segnali di controllo "
